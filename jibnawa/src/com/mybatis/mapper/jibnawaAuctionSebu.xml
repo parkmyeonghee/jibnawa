@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AuctionSebuMapper">
+<select id="auctionSebuList" parameterType="java.util.Map" resultType="java.util.HashMap">
+	select a.mem_num,a.auc_start_date,a.auc_success_cost, a.bid_cost, b.main_area_name,b.sub_area_name, a.auc_bigo, a.auc_state, a.auc_comm_id
+ 	from acu_comm a, region_info b
+ 	<where>
+ 	AND a.mem_num=#{mem_num} AND a.region_code=b.region_code
+ 	</where>
+</select>
+
+<select id="getBidderList" parameterType="java.util.Map" resultType="java.util.Map">
+select  a.a_count, a.a_stay, b.bid_addr, c.acc_name, c.acc_code
+from auc_ing a, bidder b, acc_info c
+where a.auc_comm_id=#{auc_comm_id} and a.bid_code=b.bid_code and b.acc_code=c.acc_code
+</select>
+
+<update id="aucUpd" parameterType="java.util.Map" >
+UPDATE acu_comm
+	SET auc_success_date=TO_CHAR(sysdate,'YYYY-MM-DD')
+		,ACC_CODE=#{ACC_CODE}
+		,AUC_STATE='Y'
+		,AUC_SUCCESS_COST=#{AUC_SUCCESS_COST}
+	WHERE auc_comm_id=#{AUC_COMM_ID}
+</update>
+
+</mapper>

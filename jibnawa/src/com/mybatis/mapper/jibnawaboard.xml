@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BoardMapper">
+<insert id="boardInsert" parameterType="jbVO">
+insert into acc_board (ac_no,ac_email,ac_title,ac_pw,ac_content,ac_date,au_hit,ac_name)
+values(seq_board_no.nextval,#{ac_email},#{ac_title},#{ac_pw},#{ac_content},TO_CHAR(sysdate,'YYYY-MM-DD'),0,#{ac_name})
+</insert>
+<select id="getBoardList" resultType="map" parameterType="jbVO">
+select *
+from acc_board
+
+<where>
+			<if test="ac_no!=0">
+				AND ac_no = #{ac_no}
+			</if>
+				
+		</where>	   
+
+
+
+</select>
+
+<select id="boardRead" resultType="map" parameterType="jbVO">
+select ac_title,ac_name,ac_content
+from acc_board
+</select>
+</mapper>

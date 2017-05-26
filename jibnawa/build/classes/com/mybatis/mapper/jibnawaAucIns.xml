@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AucInsMapper">
+	<select id="currentTime" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT TO_CHAR(sysdate,'YYYY-MM-DD') FROM dual
+	</select>
+	<select id="RegioncodeList" parameterType="com.jibnawa.AucIns.JibnawaAucSelVO"
+	 resultType="map">
+		 <!-- SELECT DISTINCT(main_area_name)
+		 FROM region_info -->
+		 SELECT DISTINCT main_area_name,main_code
+		 FROM region_info
+		 order by main_code		 
+				   <!--   SELECT sub_area_name 
+				     FROM REGION_INFO 
+					 GROUP BY sub_area_name
+					  -->
+     <!--  <where>
+        <if test ="_parameter != null">
+        AND region_code = #{sub_area_code}
+        </if>
+      </where> -->
+   </select>
+   <select id="RegioncodeListSub" parameterType="com.jibnawa.AucIns.JibnawaAucSelVO"
+    resultType="map">
+   SELECT region_code, sub_area_name
+   FROM region_info
+<where>
+	<if test ="main_area_name != null">
+	 AND main_area_name = #{main_area_name}
+	</if>
+</where>
+	order by sub_area_name
+  	
+  	<!-- WHERE main_area_name = #{main_area_name} -->
+
+									  <!--  <where>
+									        <if test ="_parameter != null">
+									        AND sub_area_name = #{_parameter}
+									        </if>
+									    </where> -->
+   					<!-- SELECT man_area_name
+   					FROM REGION_INFO
+   		<where>
+        	<if test ="_parameter != null">
+        		 AND region_code = #{region_code} 
+        	</if>
+      	</where> -->
+   			<!-- 		where region_code = #{sub_area_code}
+   			<where>
+   				region_code = #{sub_area_code}
+   			</where> -->
+   </select>
+	<insert id="jibnawaInsert" parameterType="map" >
+		INSERT INTO ACU_COMM (auc_comm_id
+					, auc_comm_bigo
+					, auc_start_date
+					, auc_end_date
+					, bid_cost
+					, mem_num
+					, mem_name
+					, check_in_date
+					, check_out_date
+					, region_code 
+					, acc_code
+					, auc_state
+					)
+		 		VALUES(SEQ_COMM_ID.nextval
+		 			, #{auc_comm_bigo}
+		 			, TO_CHAR(sysdate,'YYYY-MM-DD')
+		 			, to_date(TO_CHAR(sysdate,'YYYY-MM-DD'),'YYYY-MM-DD')+3
+		 			, #{bid_cost} 
+		 			, #{mem_num}
+		 			, #{mem_name}
+		 			, #{check_in_date}
+		 			, #{check_out_date}
+		 			, #{region_code}
+		 			, 0
+		 			, 'N'
+ 			
+		 			)
+<!-- 	재한 성공	
+	INSERT INTO ACU_COMM (auc_comm_id
+					, acc_code
+					, auc_comm_bigo
+					, auc_start_date
+					, auc_end_date
+					, bid_cost
+					, mem_num
+					, acc_code
+					, check_in_date
+					, check_out_date
+					, region_code 
+							)
+		 		VALUES(SEQ_COMM_ID.nextval, 0, #{auc_comm_bigo}, #{auc_start_date}
+		 		, #{auc_end_date}, #{bid_cost}, 1, 1, #{check_in_date}, #{check_out_date}
+		 		, #{region_code}) -->
+	<!-- 우경이형		
+insert into ACU_COMM(auc_comm_id, 
+			acc_code,
+			auc_start_date,
+			auc_end_date, 
+			auc_bigo, 
+			bid_cost, 
+			mem_num, 
+			region_code,
+			auc_comm_bigo
+			,check_in_date,
+			check_out_date)
+		VALUES(seq_comm_id.nextval
+				,0
+				,TO_CHAR(sysdate,'YYYY-MM-DD')
+			  , to_date(TO_CHAR(sysdate,'YYYY-MM-DD'),'YYYY-MM-DD')+3
+			  , #{auc_bigo}
+			  , #{bid_cost}
+			  , 1
+			  , #{region_code}
+			  , #{auc_comm_bigo}
+			  , #{check_in_date}
+			  , #{check_out_date}) -->
+			
+	<!--내꺼 
+			(auc_no, region_code, sub_area_code, acc_start_date
+				, acc_end_date, auc_start_date, auc_end_date, contract_price
+				, contract_price_end, headcount)
+	        VALUES(SEQ_AUC_PROD_NO.nextval, #{region_code}, #{sub_area_code}, #{acc_start_date}
+	        	, #{acc_end_date}, #{auc_start_date}, #{auc_end_date}
+	        	, #{contract_price}, #{contract_price_end}, #{headcount}) -->
+	</insert>
+</mapper>
+
+
+
+
+
+
+
+
+

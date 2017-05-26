@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jibnawaRauctionMapper">
+	
+	<select id="jibnawaRauctionList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		select * from acu_comm 
+		where region_code in (select region_code from acc_info where mem_num = #{MEM_NUM}) and auc_state ='N' and mem_num != #{MEM_NUM}
+MINUS
+select  c.auc_comm_id      , 
+ c.auc_comm_bigo    ,
+ c.auc_start_date   ,
+ c.auc_end_date     ,
+ c.auc_success_cost ,
+ c.auc_success_date ,
+ c.auc_bigo         ,
+ c.bid_email        ,
+ c.bid_cost         ,
+ c.mem_num          ,
+ c.acc_code         ,
+ c.mem_name         ,
+ c.check_in_date    ,
+ c.check_out_date   ,
+ c.region_code      ,
+ c.auc_state        from auc_ing a , bidder b, acu_comm c where b.mem_num=#{MEM_NUM} and a.bid_code = b.bid_code and a.auc_comm_id=c.auc_comm_id
+
+	
+	</select>	
+	
+		<select id="jibnawaIngList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		
+		select c.auc_comm_id      , 
+ c.auc_comm_bigo    ,
+ c.auc_start_date   ,
+ c.auc_end_date     ,
+ c.auc_success_cost ,
+ c.auc_success_date ,
+ c.auc_bigo         ,
+ c.bid_email        ,
+ c.bid_cost         ,
+ c.mem_num          ,
+ c.acc_code         ,
+ c.mem_name         ,
+ c.check_in_date    ,
+ c.check_out_date   ,
+ c.region_code      ,
+ c.auc_state,
+ a.a_count
+  from auc_ing a , bidder b, acu_comm c where b.mem_num=#{MEM_NUM} and a.bid_code = b.bid_code and a.auc_comm_id=c.auc_comm_id and AUC_STATE ='N'
+	   
+	
+	</select>	
+	
+	
+		<select id="jibnawaSucessList" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		
+		select * from acu_comm 
+	where acc_code = (select acc_code from acc_info 
+	where mem_num = #{MEM_NUM} and AUC_STATE='Y')
+   
+	
+	</select>
+	
+	<select id="RauctionView" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		
+		
+		Select (select count(auc_comm_id)
+from(
+select * from acu_comm
+where region_code in (select region_code from acc_info where mem_num = #{MEM_NUM} and auc_state ='N')  
+MINUS
+select  c.auc_comm_id      , 
+ c.auc_comm_bigo    ,
+ c.auc_start_date   ,
+ c.auc_end_date     ,
+ c.auc_success_cost ,
+ c.auc_success_date ,
+ c.auc_bigo         ,
+ c.bid_email        ,
+ c.bid_cost         ,
+ c.mem_num          ,
+ c.acc_code         ,
+ c.mem_name         ,
+ c.check_in_date    ,
+ c.check_out_date   ,
+ c.region_code      ,
+ c.auc_state        from auc_ing a , bidder b, acu_comm c where b.mem_num=#{MEM_NUM} and a.bid_code = b.bid_code and a.auc_comm_id=c.auc_comm_id)) as "a"
+,(select count(c.auc_comm_id)  from auc_ing a , bidder b, acu_comm c where b.mem_num=#{MEM_NUM} and a.bid_code = b.bid_code and a.auc_comm_id=c.auc_comm_id and AUC_STATE ='N') as "b",
+( select count(auc_comm_id) from acu_comm 
+where acc_code = (select acc_code from acc_info 
+where mem_num = #{MEM_NUM} and AUC_STATE='Y')) as "c" from dual
+
+		
+		
+		
+		
+		</select>
+	
+	<insert id="bidder_add" parameterType="map">
+	<selectKey keyProperty="ACC_CODE" resultType="int" order="BEFORE">
+         SELECT ACC_CODE
+								FROM ACC_INFO
+								WHERE MEM_NUM=#{MEM_NUM}
+      </selectKey>
+          
+      
+      insert into BIDDER(bid_code, mem_num, bid_name, region_code, bid_email, 
+     								 bid_phone_f, bid_lev, bid_phone_e, bid_addr, acc_car, acc_code,bid_phone_m)
+	values(SEQ_BID_CODE.nextval,#{MEM_NUM},#{BID_NAME},(SELECT REGION_CODE
+								FROM ACC_INFO
+								WHERE MEM_NUM=#{MEM_NUM}),#{BID_EMAIL},#{BID_PHONE_F},#{BID_LEV},#{BID_PHONE_E},(SELECT ADDR
+								FROM ACC_INFO
+								WHERE MEM_NUM=#{MEM_NUM}),#{ACC_CAR},#{ACC_CODE},#{BID_PHONE_M})
+      
+	
+	</insert> 
+	
+	
+	  <insert id="bidaction" parameterType="map">
+       <selectKey keyProperty="LAST_NUMBER" resultType="int" order="BEFORE">
+       
+       select LAST_NUMBER-1 from user_sequences
+		where SEQUENCE_NAME = 'SEQ_BID_CODE'
+       
+       
+           </selectKey>
+      insert into	AUC_ING(BID_CODE,AUC_COMM_ID,ORDER_NO,A_REGION,A_COUNT,A_STAY,MEM_NUM)
+	values(#{LAST_NUMBER},#{AUC_COMM_ID},SEQ_ORDER_NO.nextval,#{A_REGION},#{A_COUNT},#{A_STAY},#{MEM_NUM})
+    </insert>    
+   
+    <insert id="accInfoIns" parameterType="map">
+       
+     insert into ACC_INFO(ACC_CODE,REGION_CODE,CATEGORY_CODE,ACC_NAME,MEM_NUM,ADDR)
+	values(SEQ_ACC_CODE.nextval,#{region_code},#{category_code},#{acc_name},#{mem_num},#{addr})
+    </insert>    
+    
+    <select id="accInfoIns2" parameterType="map" resultType="String">
+       
+SELECT DECODE((select ACC_CODE from acc_info where mem_num = #{mem_num}), NULL, 'N', 'Y') as "exist" FROM DUAL 
+    </select>    
+    
+
+    
+    
+	
+</mapper>

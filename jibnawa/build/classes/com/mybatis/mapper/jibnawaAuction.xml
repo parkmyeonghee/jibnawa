@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AuctionMapper">
+
+<select id="auctionList" parameterType="java.util.Map" resultType="java.util.Map">
+select  a.a_count, a.a_stay, b.bid_addr, c.acc_name
+from auc_ing a, bidder b, acc_info c
+where a.auc_comm_id=2 and a.bid_code=b.bid_code and b.acc_code=c.acc_code
+</select>
+
+<update id="auctionconUpdate" parameterType="java.util.Map" >
+UPDATE acu_comm
+	SET auc_success_date=TO_CHAR(sysdate,'YYYY-MM-DD)
+		,AUC_STATE='Y'
+		,AUC_SUCCESS_COST=30000
+	WHERE auc_comm_id=33
+</update>
+
+</mapper>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jibnawaSearchMapper">
+	<select id="test" parameterType="java.lang.String" resultType="java.lang.String">
+		SELECT TO_CHAR(sysdate,'YYYY-MM-DD') FROM dual
+	</select>
+	<select id="jibnawaSearch" parameterType="java.util.HashMap" resultType="java.util.HashMap">
+		SELECT DISTINCT main_area_name, main_code from region_info order by main_code
+	</select>
+	<select id="jibnawaSearch2" parameterType="java.lang.String" resultType="java.util.HashMap">
+		SELECT sub_area_name,region_code from region_info
+   <where>
+        <if test ="_parameter != null">
+        AND main_area_name = #{_parameter}
+        </if>
+    </where>
+	</select>
+	<insert id="ins" parameterType="map">
+	insert into acu_comm(auc_comm_id,acc_code, auc_start_date, auc_end_date, auc_bigo, bid_cost, mem_num, mem_name, region_code,auc_comm_bigo,check_in_date,check_out_date,auc_state)
+        values(seq_comm_id.nextval,0,TO_CHAR(sysdate,'YYYY-MM-DD'), to_date(TO_CHAR(sysdate,'YYYY-MM-DD'),'YYYY-MM-DD')+3, #{auc_bigo}, #{bid_cost},#{mem_num},(select mem_name from member_acc where mem_num = #{mem_num}), #{region_code},#{auc_comm_bigo},#{check_in_date},#{check_out_date},'N')
+	</insert>
+</mapper>
